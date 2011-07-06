@@ -1,0 +1,31 @@
+apply plugin:"java"
+apply plugin:"eclipse"
+apply plugin:"maven"
+
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+	mavenRepo urls:"http://repository.springsource.com/maven/bundles/release"
+	mavenRepo urls:"http://repository.springsource.com/maven/bundles/external"
+	mavenRepo urls:"http://maven.springframework.org/release"
+	mavenRepo urls:"http://maven.springframework.org/milestone"
+	mavenRepo urls:"http://maven.springframework.org/snapshot"
+	
+}
+
+dependencies {
+	compile ('com.hp.hpl.jena:jena:2.6.4')
+	compile ('com.hp.hpl.jena:arq:2.8.8')
+	compile ('org.springframework:spring-core:3.0.5.RELEASE')
+	testCompile group: 'junit', name: 'junit', version: '4.8.2'
+	
+}
+
+configure(install.repositories.mavenInstaller) {
+	pom.project {
+		version '0.1'
+		artifactId 'spring-jena'
+		groupId 'org.springframework.data'
+	}
+}

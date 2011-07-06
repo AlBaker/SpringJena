@@ -1,0 +1,11 @@
+TODO List
+====================
+
+- Spring transaction support across SparqlTemplate and JenaTemplate
+- Extract interface to TripleStores for specific "modelmaker" providers in Jena,
+  such as AllegroGraph or Stardog
+- Add QuerySolutionMap overloaded arguments to SparqlTemplate to support query bindings
+- Implement Spring Mapping API for object mapping support
+- Taglib for MVC model processing
+
+

@@ -1,0 +1,16 @@
+Spring Jena
+--------------
+
+A simple set of templates to "Spring-ize" Jena and SPARQL usage.  Also
+serve as the basis for building Spring Data support for Jena
+
+See also the Groovy support: https://github.com/AlBaker/GroovySparql
+
+License
+--------------
+http://www.apache.org/licenses/LICENSE-2.0
+
+
+TODO
+--------------
+See TODO file
