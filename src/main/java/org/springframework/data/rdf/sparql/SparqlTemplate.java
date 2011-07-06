@@ -33,6 +33,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 
+
 /**
  * <code>SparqlTemplate</code>
  * 
@@ -214,6 +215,19 @@ public class SparqlTemplate {
 			}
 			return row;
 		}
+	}
+	
+	/**
+	 * <code>execSelect(String query)</code>
+	 * @param sparql - SELECT based SPARQL to execute
+	 * @return map of parameters in the result set
+	 */
+	public List<Map<String, Object>> execSelectGenericMap(String sparql) {
+		return execSelectList(sparql, new genericMapSolutionMapper());
+	}
+	
+	public Map<String, Object> execSelectSingleGenericMap(String sparql) {
+		return execSelectOne(sparql, new genericMapSolutionMapper());
 	}
 
 
