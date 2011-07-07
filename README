@@ -1,7 +1,7 @@
 Spring Jena
 --------------
 
-A simple set of templates to "Spring-ize" Jena and SPARQL usage.  Also
+Currently a simple set of templates to "Spring-ize" Jena and SPARQL usage.  Also
 serve as the basis for building Spring Data support for Jena
 
 See also the Groovy support: https://github.com/AlBaker/GroovySparql
