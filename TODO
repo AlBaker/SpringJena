@@ -7,5 +7,6 @@ TODO List
 - Add QuerySolutionMap overloaded arguments to SparqlTemplate to support query bindings
 - Implement Spring Mapping API for object mapping support
 - Taglib for MVC model processing
+- Add Spring Resource API support for handling RDF file import
 
 
