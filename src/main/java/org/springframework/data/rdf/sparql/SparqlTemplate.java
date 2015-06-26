@@ -57,11 +57,11 @@ public class SparqlTemplate {
 	 * Constructor - Jena Model
 	 * @param model
 	 */
-	SparqlTemplate(Model model) {
+	public SparqlTemplate(Model model) {
 		this.model = model;
 	}
 	
-	SparqlTemplate() { }
+	public SparqlTemplate() { }
 
 	private Model model;
 
