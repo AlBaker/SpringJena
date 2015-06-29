@@ -21,14 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.query.Syntax;
+import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
@@ -123,6 +116,44 @@ public class SparqlTemplate {
 		return list;
 	}
 
+	/**
+	 * <code>execSelectList</code>
+	 * @param sparql the String representing the SPARQL query
+	 * @param bindings query variable bindings
+	 * @param mapper the Implementation of SolutionMapper<T>
+	 * @param <T> Template for the List of objects to be returned
+	 * @return List<T> which is mapped to the results of the query
+	 */
+	public <T> List<T> execSelectList(String sparql, Map<String, RDFNode> bindings, SolutionMapper<T> mapper) {
+		if (sparql == null || sparql.equals(""))
+			return null;
+
+		QuerySolutionMap map = new QuerySolutionMap();
+		for(Map.Entry<String,RDFNode> binding : bindings.entrySet()) {
+			map.add(binding.getKey(), binding.getValue());
+		}
+
+		QueryExecution qe = QueryExecutionFactory.create(QueryFactory.create(sparql, Syntax.syntaxARQ), model);
+		qe.setInitialBinding(map);
+
+		ArrayList<T> list = new ArrayList<T>();
+		try {
+			for (ResultSet rs = qe.execSelect(); rs.hasNext() ; ) {
+				list.add(mapper.mapSelect(rs, rs.getRowNumber()));
+			}
+		} finally {
+			qe.close();
+		}
+		return list;
+	}
+
+	/**
+	 * <code>execSelectOne</code>
+	 * @param sparql the String representing the SPARQL query
+	 * @param mapper the Implementation of SolutionMapper<T>
+	 * @param <T> Template for the object to be returned
+	 * @return T which is mapped to the results of the query
+	 */
 	public <T> T execSelectOne(String sparql, SolutionMapper<T> mapper) {
 		if (sparql == null || sparql.equals("")) {
 			return null;
@@ -140,6 +171,73 @@ public class SparqlTemplate {
 			qe.close();
 		}
 
+	}
+
+	/**
+	 * <code>execSelectOne</code>
+	 * @param sparql the String representing the SPARQL query
+	 * @param bindings query variable bindings
+	 * @param mapper the Implementation of SolutionMapper<T>
+	 * @param <T> Template for the object to be returned
+	 * @return T which is mapped to the results of the query
+	 */
+	public <T> T execSelectOne(String sparql, Map<String, RDFNode> bindings, SolutionMapper<T> mapper) {
+		if (sparql == null || sparql.equals("")) {
+			return null;
+		}
+
+		QuerySolutionMap map = new QuerySolutionMap();
+		for(Map.Entry<String,RDFNode> binding : bindings.entrySet()) {
+			map.add(binding.getKey(), binding.getValue());
+		}
+
+		QueryExecution qe = QueryExecutionFactory.create(QueryFactory.create(sparql, Syntax.syntaxARQ), model);
+		qe.setInitialBinding(map);
+
+		try {
+			ResultSet rs = qe.execSelect();
+			if (rs.hasNext()) {
+				return mapper.mapSelect(rs, rs.getRowNumber());
+			} else {
+				return null;
+			}
+		} finally {
+			qe.close();
+		}
+	}
+
+	/**
+	 * <code>execSelectMap</code>
+	 * @param <T> Key
+	 * @param <V> Value
+	 * @param sparql Sparql query to be executed
+	 * @param bindings query variable bindings
+	 * @param mapper SolutionDimensionalMapper
+	 * @return combined map of all the results (HashMap)
+	 */
+	public <T, V> Map<T, V> execSelectMap(String sparql, Map<String, RDFNode> bindings, SolutionDimensionalMapper<T, V> mapper) {
+
+		if(sparql == null || sparql.equals("")) {
+			return null;
+		}
+
+		QuerySolutionMap map = new QuerySolutionMap();
+		for(Map.Entry<String,RDFNode> binding : bindings.entrySet()) {
+			map.add(binding.getKey(), binding.getValue());
+		}
+
+		QueryExecution qe = QueryExecutionFactory.create(QueryFactory.create(sparql, Syntax.syntaxARQ), model);
+		qe.setInitialBinding(map);
+
+		Map<T, V> list = new HashMap<T, V>();
+		try {
+			for (ResultSet rs = qe.execSelect(); rs.hasNext() ; ) {
+				list.putAll(mapper.mapSelect(rs, rs.getRowNumber()));
+			}
+		} finally {
+			qe.close();
+		}
+		return list;
 	}
 
 	/**
@@ -170,15 +268,50 @@ public class SparqlTemplate {
 	 * Template method for executing a CONSTRUCT statement
 	 * No mapper is used as the mapping is performed in the SPARQL
 	 * 
-	 * @param sparql
+	 * @param sparql Sparql query to be executed
 	 * @return new Model
 	 */
 	public Model execConstruct(String sparql) {
 		Query query = QueryFactory.create(sparql);
 		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		Model m = qe.execConstruct();
-		qe.close();
-		return m;
+
+		try {
+			return qe.execConstruct();
+		} finally {
+			qe.close();
+		}
+	}
+
+	/**
+	 * <code>execConstruct</code>
+	 *
+	 * Template method for executing a CONSTRUCT statement
+	 * No mapper is used as the mapping is performed in the SPARQL
+	 *
+	 * @param sparql Sparql query to be executed
+	 * @param bindings query variable bindings
+	 * @return new Model
+	 */
+	public Model execConstruct(String sparql, Map<String, RDFNode> bindings) {
+
+		if(sparql == null || sparql.equals("")) {
+			return null;
+		}
+
+		QuerySolutionMap map = new QuerySolutionMap();
+		for(Map.Entry<String,RDFNode> binding : bindings.entrySet()) {
+			map.add(binding.getKey(), binding.getValue());
+		}
+
+		Query query = QueryFactory.create(sparql);
+		QueryExecution qe = QueryExecutionFactory.create(query, model);
+		qe.setInitialBinding(map);
+
+		try {
+			return qe.execConstruct();
+		} finally {
+			qe.close();
+		}
 	}
 
 
@@ -233,7 +366,6 @@ public class SparqlTemplate {
 
 	/**
 	 * <code>execSelectOne</code>
-	 * @param model - model to be queried
 	 * @param sparql - SELECT based sparql query
 	 * @return single map of property to value
 	 */
