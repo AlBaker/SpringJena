@@ -10,11 +10,10 @@ repositories {
 }
 
 dependencies {
-	compile ('org.apache.jena:jena:2.11.1')
+	compile ('org.apache.jena:jena-core:2.11.1')
 	compile ('org.apache.jena:jena-arq:2.11.1')
 	compile ('org.springframework:spring-core:4.0.3.RELEASE')
 	testCompile group: 'junit', name: 'junit', version: '4.8.2'
-	
 }
 
 configure(install.repositories.mavenInstaller) {
